@@ -120,6 +120,8 @@ v_e = cell(1,8);
 x_e = cell(1,8);
 a_e = cell(1,8);
 
+start_position = zeros(3,8);
+streuung = zeros(1,8);
 
 for j=1:8
     v_e{j} = zeros(length(t),3)';
@@ -144,6 +146,8 @@ for j=1:8
             x_e{j}(:,i+1) = x_e{j}(:,i) - v_e{j}(:,i-1) *dt; 
         end
     end
+    start_position(:,j) = x_e{j}(:,end);
+    streuung(:,j) = norm(start_position(:,j));
     figure
     plot3(x_e{j}(1,:),x_e{j}(2,:),x_e{j}(3,:),'LineWidth',4);
     hold on
