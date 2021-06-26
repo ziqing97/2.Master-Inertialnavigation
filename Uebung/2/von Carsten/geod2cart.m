@@ -1,0 +1,9 @@
+function pos = geod2cart(lat, lon, h)
+a = 6378137;
+f = 1.0/298.257223563;
+e2 = (2-f)*f;
+N = a/sqrt(1-e2*sin(lat)^2);
+x = (N+h)*cos(lat)*cos(lon);
+y = (N+h)*cos(lat)*sin(lon);
+z = (N*(1-e2)+h)*sin(lat);
+pos = [x y z]';
