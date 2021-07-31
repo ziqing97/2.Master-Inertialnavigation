@@ -216,107 +216,107 @@ saveas(gcf,'A2_euler.png')
 % 
 % %% KF
 % 
-% dt = 0.02;
-% % dt = 5;
-% % % % dt = 60;
-% dt = 120;
-% step = dt/(1/50);
-% len1 = floor(len/step);
-% 
-% tau = 10;
-% beta = 1 / tau;
-% 
-% pos_kf = zeros(3,len1);
-% v_kf = zeros(3,len1);
-% 
-% 
-% var_gauss_acc = 1e-5;
-% var_gauss_gyro = 1e-8;
-% x = zeros(15,1);
-% P = cell(len,1);
-% P{1} = diag([100;100;100;10;10;10;0.1;0.1;0.1;1;1;1;0.1;0.1;0.1]);
-% H = [eye(6),zeros(6,9)];
-% R = eye(6) * 1/1000;
-% code = 2;
-% if code == 1
-%     pos_kf = zeros(3,len1-1);
-%     v_kf = zeros(3,len1-1);
-% end
-% pos_kf(:,1) = pos(:,1);
-% v_kf(:,1) = v(:,1);
-% for i = 2:len1
-%     % F matrix
-%     F = zeros(15);
-%     F(1:3,4:6) = eye(3);
-%     F(4:6,1:3) = -Omega_ie * Omega_ie;
-%     F(4:6,4:6) = -2 * Omega_ie;
-%     F(4:6,7:9) = [0,-acc(3,(i-1)*step +1),acc(2,(i-1)*step +1); acc(3,(i-1)*step +1),...
-%         0,-acc(1,(i-1)*step +1); -acc(2,(i-1)*step +1),acc(1,(i-1)*step +1),0];
-%     [lon,lat,~] = cart2ellip(pos(1,(i-1)*step +1),pos(2,(i-1)*step +1),pos(3,(i-1)*step +1),a,e);
-%     C_p2e = C_n2e(lat,lon) * C_b2n(GyroX((i-1)*step +1),GyroY((i-1)*step +1),GyroZ((i-1)*step +1));
-%     F(4:6,10:12) = C_p2e;
-%     F(7:9,7:9) = -Omega_ie;
-%     F(7:9,13:15) = -C_p2e;
-%     F(10:12,10:12) = -eye(3) * beta;
-%     F(13:15,13:15) = -eye(3) * beta;
-%     % G matrix
-%     G = zeros(15,6);
-%     G(10:12,1:3) = eye(3) * sqrt(beta * var_gauss_acc);
-%     G(13:15,4:6) = eye(3) * sqrt(beta * var_gauss_gyro);
-%     A = [-F,G * G';zeros(15),F'] * dt;
-%     B = expm(A);
-%     Phi = B(16:30,16:30)';
-%     Q = Phi * B(1:15,16:30);
-%     
-%     xnnp = Phi * x;
-%     Pnnp = Phi * P{i-1} * Phi' + Q;
-%     K = Pnnp * H' * inv(H * Pnnp * H' + R);
-% 
-%     z1 = pos(:,1) - pos(:,i-1);
-%     z2 = [0;0;0] - v(:,i-1);
-%  
-%     z = [z1;z2];
-%     x_dach = xnnp + K * (z - H * xnnp);
-%     P{i} = (eye(15) - K * H) * Pnnp;
-% 
-%     v_kf(:,i) = v(:,(i-1)*step +1) + x_dach(4:6);  
-%     pos_kf(:,i) = pos(:,(i-1)*step +1) + x_dach(1:3);
-% 
-% end
-% 
-% 
-% figure
-% plot3(pos_kf(1,1:end-1)-pos(1,1),pos_kf(2,1:end-1)-pos(2,1),pos_kf(3,1:end-1)-pos(3,1));
-% %     hold on
-% %     plot3(pos(1,:),pos(2,:),pos(3,:))
-% 
-% 
-% figure
-% subplot(3,1,1)
-% plot(pos_kf(1,:)-pos(1,1:step:(i-1)*step +1))
-% title('pos diff -x')
-% subplot(3,1,2)
-% plot(pos_kf(2,:)-pos(2,1:step:(i-1)*step +1))
-% title('pos diff -y')
-% subplot(3,1,3)
-% plot(pos_kf(3,:)-pos(3,1:step:(i-1)*step +1))
-% title('pos diff -z')
-% 
-% figure
-% subplot(3,1,1)
-% plot(v_kf(1,:)-v(1,1:step:(i-1)*step +1))
-% title('vel diff -x')
-% subplot(3,1,2)
-% plot(v_kf(2,:)-v(2,1:step:(i-1)*step +1))
-% title('vel diff -y')
-% subplot(3,1,3)
-% plot(v_kf(3,:)-v(3,1:step:(i-1)*step +1))
-% title('vel diff -z')
-% 
-% figure
-% rr1 = sqrt(pos(1,:).^2 + pos(2,:).^2 + pos(3,:).^2);
-% rr2 = sqrt(pos_kf(1,:).^2 + pos_kf(2,:).^2 + pos_kf(3,:).^2);
-% subplot(2,1,1)
-% plot(rr1(1:end-1))
-% subplot(2,1,2)
-% plot(rr2(1:end-1))
+dt = 0.02;
+% dt = 5;
+% % % dt = 60;
+dt = 120;
+step = dt/(1/50);
+len1 = floor(len/step);
+
+tau = 10;
+beta = 1 / tau;
+
+pos_kf = zeros(3,len1);
+v_kf = zeros(3,len1);
+
+
+var_gauss_acc = 1e-5;
+var_gauss_gyro = 1e-8;
+x = zeros(15,1);
+P = cell(len,1);
+P{1} = diag([100;100;100;10;10;10;0.1;0.1;0.1;1;1;1;0.1;0.1;0.1]);
+H = [eye(6),zeros(6,9)];
+R = eye(6) * 1/1000;
+code = 2;
+if code == 1
+    pos_kf = zeros(3,len1-1);
+    v_kf = zeros(3,len1-1);
+end
+pos_kf(:,1) = pos(:,1);
+v_kf(:,1) = v(:,1);
+for i = 2:len1
+    % F matrix
+    F = zeros(15);
+    F(1:3,4:6) = eye(3);
+    F(4:6,1:3) = -Omega_ie * Omega_ie;
+    F(4:6,4:6) = -2 * Omega_ie;
+    F(4:6,7:9) = [0,-acc(3,(i-1)*step +1),acc(2,(i-1)*step +1); acc(3,(i-1)*step +1),...
+        0,-acc(1,(i-1)*step +1); -acc(2,(i-1)*step +1),acc(1,(i-1)*step +1),0];
+    [lon,lat,~] = cart2ellip(pos(1,(i-1)*step +1),pos(2,(i-1)*step +1),pos(3,(i-1)*step +1),a,e);
+    C_p2e = C_n2e(lat,lon) * C_b2n(GyroX((i-1)*step +1),GyroY((i-1)*step +1),GyroZ((i-1)*step +1));
+    F(4:6,10:12) = C_p2e;
+    F(7:9,7:9) = -Omega_ie;
+    F(7:9,13:15) = -C_p2e;
+    F(10:12,10:12) = -eye(3) * beta;
+    F(13:15,13:15) = -eye(3) * beta;
+    % G matrix
+    G = zeros(15,6);
+    G(10:12,1:3) = eye(3) * sqrt(beta * var_gauss_acc);
+    G(13:15,4:6) = eye(3) * sqrt(beta * var_gauss_gyro);
+    A = [-F,G * G';zeros(15),F'] * dt;
+    B = expm(A);
+    Phi = B(16:30,16:30)';
+    Q = Phi * B(1:15,16:30);
+    
+    xnnp = Phi * x;
+    Pnnp = Phi * P{i-1} * Phi' + Q;
+    K = Pnnp * H' * inv(H * Pnnp * H' + R);
+
+    z1 = pos(:,1) - pos(:,i-1);
+    z2 = [0;0;0] - v(:,i-1);
+ 
+    z = [z1;z2];
+    x_dach = xnnp + K * (z - H * xnnp);
+    P{i} = (eye(15) - K * H) * Pnnp;
+
+    v_kf(:,i) = v(:,(i-1)*step +1) + x_dach(4:6);  
+    pos_kf(:,i) = pos(:,(i-1)*step +1) + x_dach(1:3);
+
+end
+
+
+figure
+plot3(pos_kf(1,1:end-1)-pos(1,1),pos_kf(2,1:end-1)-pos(2,1),pos_kf(3,1:end-1)-pos(3,1));
+%     hold on
+%     plot3(pos(1,:),pos(2,:),pos(3,:))
+
+
+figure
+subplot(3,1,1)
+plot(pos_kf(1,:)-pos(1,1:step:(i-1)*step +1))
+title('pos diff -x')
+subplot(3,1,2)
+plot(pos_kf(2,:)-pos(2,1:step:(i-1)*step +1))
+title('pos diff -y')
+subplot(3,1,3)
+plot(pos_kf(3,:)-pos(3,1:step:(i-1)*step +1))
+title('pos diff -z')
+
+figure
+subplot(3,1,1)
+plot(v_kf(1,:)-v(1,1:step:(i-1)*step +1))
+title('vel diff -x')
+subplot(3,1,2)
+plot(v_kf(2,:)-v(2,1:step:(i-1)*step +1))
+title('vel diff -y')
+subplot(3,1,3)
+plot(v_kf(3,:)-v(3,1:step:(i-1)*step +1))
+title('vel diff -z')
+
+figure
+rr1 = sqrt(pos(1,:).^2 + pos(2,:).^2 + pos(3,:).^2);
+rr2 = sqrt(pos_kf(1,:).^2 + pos_kf(2,:).^2 + pos_kf(3,:).^2);
+subplot(2,1,1)
+plot(rr1(1:end-1))
+subplot(2,1,2)
+plot(rr2(1:end-1))
